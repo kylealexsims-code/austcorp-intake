@@ -34,7 +34,7 @@ function combo(f,items,groups,tag,pick){
   order.forEach(function(gg){var g=gg.g;
    var gh=hits.filter(function(x){return x.o.grp===g[0]});
    if(!gh.length)return;
-   var MO={"job satisfaction":0,"low status":1,"high status":2,"success":3};gh.sort(q?function(a,b){return b.s-a.s||a.o.t.localeCompare(b.o.t)}:function(a,b){return ((MO[a.o.lvl]||0)-(MO[b.o.lvl]||0))||a.o.t.localeCompare(b.o.t)});
+   gh.sort(q?function(a,b){return b.s-a.s||a.o.t.localeCompare(b.o.t)}:function(a,b){return a.o.t.localeCompare(b.o.t)});
    var hd=el("div","position:sticky;top:0;z-index:1;padding:6px 11px 5px;background:var(--surface-1);border-top:"+(rows.length||list.length?"0.5px solid var(--border)":"0")+";"+TAG,g[1]);
    f.p.appendChild(hd);
    gh.forEach(function(x){var n=list.length,o=x.o;list.push(o);
@@ -61,7 +61,7 @@ var mot=field("What they want",PH.mot||"fills from the reason, or pick one");
 var sal=field("Salary",PH.sal||"$58/hr + super");
 function setLvl(o){st.lvl=o?o.lvl:null;st.k=o?o.k:null;mot.c.textContent=o?o.lvl:"";check()}
 function setWhy(o){st.push=o?o.g:null;why.c.textContent=o?GL[o.g]:""}
-combo(why,reasons,RG,function(o){return GL[o.g]+" \u00b7 "+o.lvl},function(o){
+combo(why,reasons,RG,function(o){return GL[o.g]},function(o){
  setWhy(o);st.whyAuto=false;
  if(o&&(!mot.i.value.trim()||st.motAuto)){var m=motives.filter(function(x){return x.t===o.pull})[0];
   if(m){mot.i.value=m.t;setLvl(m);st.motAuto=true}}
