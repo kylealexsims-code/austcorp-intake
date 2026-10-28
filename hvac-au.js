@@ -59,7 +59,6 @@ var PH=MKT.placeholders||{};
 var why=field("Why they're leaving",PH.why||"type or pick a reason");
 var mot=field("What they want",PH.mot||"fills from the reason, or pick one");
 var sal=field("Salary",PH.sal||"$58/hr + super");
-var need=field("What the client needs",PH.need||"optional: short on BMS commissioning, needs a Western Sydney tech");
 function setLvl(o){st.lvl=o?o.lvl:null;st.k=o?o.k:null;mot.c.textContent=o?o.lvl:"";check()}
 function setWhy(o){st.push=o?o.g:null;why.c.textContent=o?GL[o.g]:""}
 combo(why,reasons,RG,function(o){return GL[o.g]},function(o){
@@ -108,13 +107,12 @@ mot.i.addEventListener("input",function(){setLvl(null);st.motAuto=false});
 
 var err=el("div","font-size:13px;color:var(--text-danger);margin:0 0 10px;display:none","Add a reason for leaving first");host.appendChild(err);
 var go=el("button",null,"Format CV ↗");go.type="button";host.appendChild(go);
-[why,mot,sal,need].forEach(function(f){f.i.addEventListener("keydown",function(e){if(e.key==="Enter"&&f.p.style.display==="none")go.click()})});
+[why,mot,sal].forEach(function(f){f.i.addEventListener("keydown",function(e){if(e.key==="Enter"&&f.p.style.display==="none")go.click()})});
 go.addEventListener("click",function(){
  var w=why.i.value.trim();if(!w){err.style.display="block";why.i.focus();return}
  var s="Format this candidate. | Leaving: "+w;
  if(mot.i.value.trim())s+=" | Motivation: "+mot.i.value.trim();
  if(sal.i.value.trim())s+=" | Salary: "+sal.i.value.trim();
- if(need.i.value.trim())s+=" | Client need: "+need.i.value.trim();
  var as=st.acc==="asking"?"Accepts at asking figure":(st.acc==="other"&&acc.value.trim())?"Accepts at "+acc.value.trim():"";
  if(st.proc||as)s+=" | Commitment: "+[st.proc,as].filter(Boolean).join(" · ");
  if(st.push)s+=" | Herzberg: "+GL[st.push];
