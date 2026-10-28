@@ -59,6 +59,7 @@ var PH=MKT.placeholders||{};
 var why=field("Why they're leaving",PH.why||"type or pick a reason");
 var mot=field("What they want",PH.mot||"fills from the reason, or pick one");
 var sal=field("Salary",PH.sal||"$58/hr + super");
+var need=field("What the client needs",PH.need||"optional: short on BMS commissioning, needs a Western Sydney tech");
 function setLvl(o){st.lvl=o?o.lvl:null;st.k=o?o.k:null;mot.c.textContent=o?o.lvl:"";check()}
 function setWhy(o){st.push=o?o.g:null;why.c.textContent=o?GL[o.g]:""}
 combo(why,reasons,RG,function(o){return GL[o.g]},function(o){
@@ -88,6 +89,14 @@ line.appendChild(el("span",TAG,"signs at"));
 var acc=el("input","width:84px;height:30px;font-size:13px;display:none");acc.type="text";acc.placeholder="$55/hr";
 line.appendChild(seg([["asking","asking"],["other","other"]],function(v){st.acc=v;acc.style.display=v==="other"?"inline-block":"none";if(v==="other")acc.focus()}).g);
 line.appendChild(acc);row.appendChild(line);host.appendChild(row);
+var row2=el("div","margin:0 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap");
+row2.appendChild(el("span",TAG,"notice"));
+var ntc=el("input","width:84px;height:30px;font-size:13px;display:none");ntc.type="text";ntc.placeholder="6 weeks";
+row2.appendChild(seg([["now","Immediate"],["1 wk","1 week"],["2 wks","2 weeks"],["4 wks","4 weeks"],["other","other"]],function(v){st.ntc=v;ntc.style.display=v==="other"?"inline-block":"none";if(v==="other")ntc.focus()}).g);
+row2.appendChild(ntc);
+row2.appendChild(el("span",TAG,"right to work"));
+row2.appendChild(seg([["citizen","Australian citizen"],["PR","Permanent resident"],["visa","Visa holder"]],function(v){st.rtw=v}).g);
+host.appendChild(row2);
 
 var warn=el("div","font-size:13px;color:var(--text-warning);line-height:1.5;margin:0 0 12px;display:none");host.appendChild(warn);
 function check(){
@@ -99,15 +108,19 @@ mot.i.addEventListener("input",function(){setLvl(null);st.motAuto=false});
 
 var err=el("div","font-size:13px;color:var(--text-danger);margin:0 0 10px;display:none","Add a reason for leaving first");host.appendChild(err);
 var go=el("button",null,"Format CV ↗");go.type="button";host.appendChild(go);
-[why,mot,sal].forEach(function(f){f.i.addEventListener("keydown",function(e){if(e.key==="Enter"&&f.p.style.display==="none")go.click()})});
+[why,mot,sal,need].forEach(function(f){f.i.addEventListener("keydown",function(e){if(e.key==="Enter"&&f.p.style.display==="none")go.click()})});
 go.addEventListener("click",function(){
  var w=why.i.value.trim();if(!w){err.style.display="block";why.i.focus();return}
  var s="Format this candidate. | Leaving: "+w;
  if(mot.i.value.trim())s+=" | Motivation: "+mot.i.value.trim();
  if(sal.i.value.trim())s+=" | Salary: "+sal.i.value.trim();
+ if(need.i.value.trim())s+=" | Client need: "+need.i.value.trim();
  var as=st.acc==="asking"?"Accepts at asking figure":(st.acc==="other"&&acc.value.trim())?"Accepts at "+acc.value.trim():"";
  if(st.proc||as)s+=" | Commitment: "+[st.proc,as].filter(Boolean).join(" · ");
  if(st.push)s+=" | Herzberg: "+GL[st.push];
  if(st.lvl)s+=" | Maslow: "+st.lvl;
+ var nt=st.ntc==="other"?ntc.value.trim():(st.ntc||"");
+ if(nt)s+=" | Notice: "+nt;
+ if(st.rtw)s+=" | Right to work: "+st.rtw;
  sendPrompt(s)});
 })();
