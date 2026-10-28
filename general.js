@@ -3,9 +3,9 @@ var MKT={"market":"General (all sectors, trade to C-suite)","placeholders":{"why
 var GL={h:"hygiene",s:"security",m:"demotivator"};
 var LV={js:"job satisfaction",ls:"low status",hs:"high status",su:"success"};
 var PL={};MKT.motivations.forEach(function(m){PL[m.t]=LV[m.level]||m.level});
-var reasons=MKT.reasons.map(function(r){return{t:r.t,g:r.g,grp:PL[r.pull]||"job satisfaction",pull:r.pull,a:(r.keys||"").split(",").map(function(x){return x.trim()}).filter(Boolean)}});
+var reasons=MKT.reasons.map(function(r){return{t:r.t,g:r.g,grp:r.g,lvl:PL[r.pull]||"job satisfaction",pull:r.pull,a:(r.keys||"").split(",").map(function(x){return x.trim()}).filter(Boolean)}});
 var motives=MKT.motivations.map(function(m){var l=LV[m.level]||m.level;return{t:m.t,lvl:l,k:(l==="high status"||l==="success")?"g":"b",grp:l,reason:m.reason,a:(m.keys||"").split(",").map(function(x){return x.trim()}).filter(Boolean)}});
-var RG=[["job satisfaction","Job satisfaction"],["low status","Low status"],["high status","High status \u00b7 technical"],["success","Success \u00b7 leadership"]];
+var RG=[["h","Hygiene \u00b7 something bad is present"],["s","Security \u00b7 the job or employer is unstable"],["m","Demotivator \u00b7 a motivator is missing"]];
 var MG=[["job satisfaction","Job satisfaction"],["low status","Low status"],["high status","High status \u00b7 technical"],["success","Success \u00b7 leadership"]];
 var host=document.getElementById("cvf"),st={push:null,lvl:null,k:null,proc:"",acc:"",whyAuto:false,motAuto:false};
 var TAG="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:.02em";
@@ -31,11 +31,10 @@ function combo(f,items,groups,tag,pick){
   if(!hits.length||(!all&&hits.length===1&&hits[0].o.t.toLowerCase()===q))return hide();
   f.p.innerHTML="";cur=-1;list=[];rows=[];
   var order=groups.map(function(g,i){var best=0;hits.forEach(function(x){if(x.o.grp===g[0]&&x.s>best)best=x.s});return{g:g,i:i,best:best}});
-  if(q)order.sort(function(a,b){return b.best-a.best||a.i-b.i});
   order.forEach(function(gg){var g=gg.g;
    var gh=hits.filter(function(x){return x.o.grp===g[0]});
    if(!gh.length)return;
-   var HO={h:0,s:1,m:2};gh.sort(q?function(a,b){return b.s-a.s||a.o.t.localeCompare(b.o.t)}:function(a,b){return ((HO[a.o.g]||0)-(HO[b.o.g]||0))||a.o.t.localeCompare(b.o.t)});
+   var MO={"job satisfaction":0,"low status":1,"high status":2,"success":3};gh.sort(q?function(a,b){return b.s-a.s||a.o.t.localeCompare(b.o.t)}:function(a,b){return ((MO[a.o.lvl]||0)-(MO[b.o.lvl]||0))||a.o.t.localeCompare(b.o.t)});
    var hd=el("div","position:sticky;top:0;z-index:1;padding:6px 11px 5px;background:var(--surface-1);border-top:"+(rows.length||list.length?"0.5px solid var(--border)":"0")+";"+TAG,g[1]);
    f.p.appendChild(hd);
    gh.forEach(function(x){var n=list.length,o=x.o;list.push(o);
@@ -62,7 +61,7 @@ var mot=field("What they want",PH.mot||"fills from the reason, or pick one");
 var sal=field("Salary",PH.sal||"$58/hr + super");
 function setLvl(o){st.lvl=o?o.lvl:null;st.k=o?o.k:null;mot.c.textContent=o?o.lvl:"";check()}
 function setWhy(o){st.push=o?o.g:null;why.c.textContent=o?GL[o.g]:""}
-combo(why,reasons,RG,function(o){return GL[o.g]},function(o){
+combo(why,reasons,RG,function(o){return GL[o.g]+" \u00b7 "+o.lvl},function(o){
  setWhy(o);st.whyAuto=false;
  if(o&&(!mot.i.value.trim()||st.motAuto)){var m=motives.filter(function(x){return x.t===o.pull})[0];
   if(m){mot.i.value=m.t;setLvl(m);st.motAuto=true}}
