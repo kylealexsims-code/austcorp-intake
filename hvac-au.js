@@ -84,10 +84,7 @@ function seg(opts,onPick){var g=el("div","display:inline-flex;border:0.5px solid
    onPick(on?o[1]:"")});g.appendChild(b);return b});return{g:g,bs:bs}}
 line.appendChild(el("span",TAG,"other processes"));
 line.appendChild(seg([["0","No other processes"],["1","1 other process"],["2","2 other processes"],["3+","3+ other processes"]],function(v){st.proc=v}).g);
-line.appendChild(el("span",TAG,"signs at"));
-var acc=el("input","width:84px;height:30px;font-size:13px;display:none");acc.type="text";acc.placeholder="$55/hr";
-line.appendChild(seg([["asking","asking"],["other","other"]],function(v){st.acc=v;acc.style.display=v==="other"?"inline-block":"none";if(v==="other")acc.focus()}).g);
-line.appendChild(acc);row.appendChild(line);host.appendChild(row);
+row.appendChild(line);host.appendChild(row);
 var row2=el("div","margin:0 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap");
 row2.appendChild(el("span",TAG,"notice"));
 var ntc=el("input","width:84px;height:30px;font-size:13px;display:none");ntc.type="text";ntc.placeholder="6 weeks";
@@ -113,8 +110,7 @@ go.addEventListener("click",function(){
  var s="Format this candidate. | Leaving: "+w;
  if(mot.i.value.trim())s+=" | Motivation: "+mot.i.value.trim();
  if(sal.i.value.trim())s+=" | Salary: "+sal.i.value.trim();
- var as=st.acc==="asking"?"Accepts at asking figure":(st.acc==="other"&&acc.value.trim())?"Accepts at "+acc.value.trim():"";
- if(st.proc||as)s+=" | Commitment: "+[st.proc,as].filter(Boolean).join(" · ");
+ if(st.proc)s+=" | Commitment: "+st.proc;
  if(st.push)s+=" | Herzberg: "+GL[st.push];
  if(st.lvl)s+=" | Maslow: "+st.lvl;
  var nt=st.ntc==="other"?ntc.value.trim():(st.ntc||"");
