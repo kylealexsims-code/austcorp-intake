@@ -81,6 +81,10 @@ var row=el("div","display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap
 row.appendChild(pick("Other processes",["No other processes","1 other process","2 other processes","3+ other processes"],"proc"));
 row.appendChild(pick("Notice",["Immediate","1 week","2 weeks","3 weeks","4 weeks","6 weeks","8 weeks","12 weeks"],"ntc"));
 host.appendChild(row);
+var an=el("label","display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:13px;color:var(--text-secondary);cursor:pointer");
+var anc=el("input","margin:0");anc.type="checkbox";anc.addEventListener("change",function(){st.anon=anc.checked});
+an.appendChild(anc);an.appendChild(el("span",null,"Anonymise CV"));an.appendChild(el("span",TAG,"no name, employers or projects"));
+host.appendChild(an);
 
 var warn=el("div","font-size:13px;color:var(--text-warning);line-height:1.5;margin:0 0 12px;display:none");host.appendChild(warn);
 function check(){
@@ -103,5 +107,6 @@ go.addEventListener("click",function(){
  if(st.lvl)s+=" | Maslow: "+st.lvl;
  var nt=st.ntc||"";
  if(nt)s+=" | Notice: "+nt;
+ if(st.anon)s+=" | Anonymise: yes";
  sendPrompt(s)});
 })();
