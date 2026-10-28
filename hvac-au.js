@@ -10,6 +10,14 @@ var MG=[["job satisfaction","Job satisfaction"],["low status","Low status"],["hi
 var host=document.getElementById("cvf"),st={push:null,lvl:null,k:null,proc:"",acc:"",whyAuto:false,motAuto:false};
 var TAG="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:.02em";
 function el(t,css,txt){var e=document.createElement(t);if(css)e.style.cssText=css;if(txt!=null)e.textContent=txt;return e}
+function lev(a,b){var m=a.length,n=b.length,d=[],i,j;for(i=0;i<=m;i++){d[i]=[i]}for(j=1;j<=n;j++)d[0][j]=j;
+ for(i=1;i<=m;i++)for(j=1;j<=n;j++){d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1])d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1)}return d[m][n]}
+function wsim(q,w){if(w.indexOf(q)===0)return 1;var c=w.slice(0,Math.max(q.length,Math.min(w.length,q.length+2)));
+ return Math.max(0,1-Math.min(lev(q,w)/Math.max(q.length,w.length,3),lev(q,c)/Math.max(q.length,c.length,3)))}
+function fuzzy(q,o){var qs=q.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);if(!qs.length)return 0;
+ var ws=(o.t+" "+(o.a||[]).join(" ")).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean),tot=0;
+ qs.forEach(function(x){var b=0;ws.forEach(function(w){var v=wsim(x,w);if(v>b)b=v});tot+=b});return tot/qs.length}
 function score(q,o){var t=o.t.toLowerCase();if(!q)return .5;
  if(t.indexOf(q)===0)return 5;if((" "+t).indexOf(" "+q)>0)return 4;
  var b=0;(o.a||[]).forEach(function(x){if(x===q)b=Math.max(b,3.5);else if(x.indexOf(q)===0||(" "+x).indexOf(" "+q)>0)b=Math.max(b,3);else if(x.indexOf(q)>0)b=Math.max(b,1)});
@@ -28,7 +36,18 @@ function combo(f,items,groups,tag,pick){
  function hide(){f.p.style.display="none";f.p.innerHTML="";cur=-1;list=[];rows=[]}
  function draw(all){var q=all?"":f.i.value.trim().toLowerCase();
   var hits=items.map(function(o){return{o:o,s:score(q,o)}}).filter(function(x){return x.s>0});
-  if(!hits.length||(!all&&hits.length===1&&hits[0].o.t.toLowerCase()===q))return hide();
+  if(!all&&hits.length===1&&hits[0].o.t.toLowerCase()===q)return hide();
+  if(q&&hits.length<6){
+   /* never a dead end: typos, partial words and odd keys still get the closest matches */
+   var have={};hits.forEach(function(x){have[x.o.t]=1});
+   var near=items.filter(function(o){return !have[o.t]}).map(function(o){return{o:o,s:fuzzy(q,o)}})
+    .sort(function(a,b){return b.s-a.s});
+   var top=near.length?near[0].s:0;
+   /* close matches only when there are some; otherwise the nearest few, so it never goes blank */
+   near=near.filter(function(x){return hits.length?x.s>=.75:(top<.5||x.s>=top-.15)}).slice(0,8-hits.length);
+   hits=hits.concat(near.map(function(x){return{o:x.o,s:Math.min(x.s,.9)}}));
+  }
+  if(!hits.length)return hide();
   f.p.innerHTML="";cur=-1;list=[];rows=[];
   var order=groups.map(function(g,i){var best=0;hits.forEach(function(x){if(x.o.grp===g[0]&&x.s>best)best=x.s});return{g:g,i:i,best:best}});
   order.forEach(function(gg){var g=gg.g;
