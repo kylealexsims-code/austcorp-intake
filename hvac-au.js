@@ -72,27 +72,16 @@ combo(mot,motives,MG,function(o){return o.lvl},function(o){
   if(r){why.i.value=r.t;setWhy(r);st.whyAuto=true}}
  check()});
 
-var row=el("div","margin:0 0 12px");
-row.appendChild(el("div","font-size:13px;color:var(--text-secondary);margin:0 0 5px","Commitment"));
-var line=el("div","display:flex;align-items:center;gap:10px;flex-wrap:wrap");
-function seg(opts,onPick){var g=el("div","display:inline-flex;border:0.5px solid var(--border-strong);border-radius:var(--radius);overflow:hidden");
- var bs=opts.map(function(o,n){var b=el("button","border:0;border-radius:0;height:30px;padding:0 10px;font-size:13px;background:transparent;color:var(--text-secondary);"+(n?"border-left:0.5px solid var(--border-strong)":""),o[0]);
-  b.type="button";b.setAttribute("aria-pressed","false");
-  b.addEventListener("click",function(){var on=b.getAttribute("aria-pressed")!=="true";
-   bs.forEach(function(x){x.setAttribute("aria-pressed","false");x.style.background="transparent";x.style.color="var(--text-secondary)"});
-   if(on){b.setAttribute("aria-pressed","true");b.style.background="var(--bg-accent)";b.style.color="var(--text-accent)"}
-   onPick(on?o[1]:"")});g.appendChild(b);return b});return{g:g,bs:bs}}
-line.appendChild(el("span",TAG,"other processes"));
-line.appendChild(seg([["0","No other processes"],["1","1 other process"],["2","2 other processes"],["3+","3+ other processes"]],function(v){st.proc=v}).g);
-row.appendChild(line);host.appendChild(row);
-var row2=el("div","margin:0 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap");
-row2.appendChild(el("span",TAG,"notice"));
-var ntc=el("input","width:84px;height:30px;font-size:13px;display:none");ntc.type="text";ntc.placeholder="6 weeks";
-row2.appendChild(seg([["now","Immediate"],["1 wk","1 week"],["2 wks","2 weeks"],["4 wks","4 weeks"],["other","other"]],function(v){st.ntc=v;ntc.style.display=v==="other"?"inline-block":"none";if(v==="other")ntc.focus()}).g);
-row2.appendChild(ntc);
-row2.appendChild(el("span",TAG,"right to work"));
-row2.appendChild(seg([["citizen","Australian citizen"],["PR","Permanent resident"],["visa","Visa holder"]],function(v){st.rtw=v}).g);
-host.appendChild(row2);
+function pick(label,opts,key){var w=el("label","display:flex;flex-direction:column;gap:5px;min-width:0");
+ w.appendChild(el("span","font-size:13px;color:var(--text-secondary)",label));
+ var s=el("select","width:100%");s.appendChild(el("option",null,"\u2014")).value="";
+ opts.forEach(function(o){var x=el("option",null,o);x.value=o;s.appendChild(x)});
+ s.addEventListener("change",function(){st[key]=s.value});w.appendChild(s);return w}
+var row=el("div","display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 14px");
+row.appendChild(pick("Other processes",["No other processes","1 other process","2 other processes","3+ other processes"],"proc"));
+row.appendChild(pick("Notice",["Immediate","1 week","2 weeks","3 weeks","4 weeks","6 weeks","8 weeks","12 weeks"],"ntc"));
+row.appendChild(pick("Right to work",["Australian citizen","Permanent resident","Visa holder"],"rtw"));
+host.appendChild(row);
 
 var warn=el("div","font-size:13px;color:var(--text-warning);line-height:1.5;margin:0 0 12px;display:none");host.appendChild(warn);
 function check(){
@@ -113,7 +102,7 @@ go.addEventListener("click",function(){
  if(st.proc)s+=" | Commitment: "+st.proc;
  if(st.push)s+=" | Herzberg: "+GL[st.push];
  if(st.lvl)s+=" | Maslow: "+st.lvl;
- var nt=st.ntc==="other"?ntc.value.trim():(st.ntc||"");
+ var nt=st.ntc||"";
  if(nt)s+=" | Notice: "+nt;
  if(st.rtw)s+=" | Right to work: "+st.rtw;
  sendPrompt(s)});
